@@ -15,7 +15,7 @@ class Peg implements GameObject {
     draw_with_markup(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, answer:Peg[], index:number, x:number, y:number, width:number, height:number) {
         ctx.fillStyle = new RGB(125 + 60*this.type_id % 256, 92*this.type_id % 256, 125*this.type_id % 256).htmlRBG();  
         ctx.fillRect(x, y, width, height);
-        ctx.strokeStyle = new RGB(125, 125, 125, 125).htmlRBGA();
+        ctx.strokeStyle = new RGB(125, 125, 125, 125).htmlRBG();
         ctx.beginPath();
         ctx.lineWidth = 4;
 
@@ -25,7 +25,13 @@ class Peg implements GameObject {
             ctx.moveTo(x + width / 2 + radius, y + height / 2);
             ctx.arc(x + width / 2, y + height / 2, radius, 0, 2 * Math.PI);
         }
-        else if(answer.indexOf(this) !== -1)
+        let isPresent = false;
+        for(let i = 0 ; i < answer.length; i++)
+        {
+            if(answer[i].type_id === this.type_id)
+                isPresent = true;
+        }
+        if(isPresent)
         {
             ctx.moveTo(x, y + height / 2);
             ctx.lineTo(x + width, y + height / 2);
@@ -207,7 +213,7 @@ async function main()
     const touchScreen:boolean = isTouchSupported();
     let height = getHeight();
     let width = getWidth();
-    let game = new LogicField(touchListener, 4, 4, 16, height, width);
+    let game = new LogicField(touchListener, 4, 8, 16, height, width);
     touchListener.registerCallBack("touchstart", (event:TouchMoveEvent) => game.is_in_peg_selector(event.touchPos), (event:TouchMoveEvent) => {
         game.selected = game.get_peg(event.touchPos[1]);
     });
