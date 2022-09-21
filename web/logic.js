@@ -1,6 +1,6 @@
 import { SingleTouchListener, isTouchSupported, KeyboardHandler } from './io.js';
 import { getHeight, getWidth, RGB } from './gui.js';
-import { random } from './utils.js';
+import { random, srand, max_32_bit_signed } from './utils.js';
 import { menu_font_size } from './game_utils.js';
 class Peg {
     constructor(type_id) {
@@ -51,6 +51,7 @@ class LogicField {
         this.answer = [];
         this.types = type_possibilities;
         this.number_of_guesses = guesses;
+        srand(Math.random() * max_32_bit_signed - 1);
         for (let i = 0; i < answer_width; i++) {
             this.answer.push(new Peg(Math.floor(random() * type_possibilities)));
         }
@@ -86,7 +87,7 @@ class LogicField {
     try_to_place_peg(touchPos, selected) {
         const clickRowIndex = Math.floor(touchPos[1] / this.height * this.guesses());
         const rowHeight = this.height / this.guesses();
-        const currentRowY = rowHeight * (this.saved_guesses.length + 1);
+        const currentRowY = rowHeight * (16 - this.saved_guesses.length);
         if (touchPos[1] > currentRowY - rowHeight && touchPos[0] < this.width * 9 / 10) {
             const width = this.width * 9 / 10;
             const index = Math.floor(touchPos[0] / width * this.choices_per_guess());
@@ -112,6 +113,21 @@ class LogicField {
         else
             won = false;
         return won;
+    }
+    compare_answer(a, b) {
+        for (let i = 0; i < a.length; i++) {
+            if (a[i] !== b[i])
+                return false;
+        }
+        return true;
+    }
+    has_lost() {
+        let lost = (!this.has_won() && this.saved_guesses.length === this.guesses());
+        const final_guess = this.saved_guesses[this.saved_guesses.length - 1];
+        if (lost) {
+            lost = this.compare_answer(final_guess, this.answer);
+        }
+        return lost;
     }
     draw(canvas, ctx, xi, yi, render_width = this.width, render_height = this.height) {
         this.width = render_width;
@@ -144,15 +160,29 @@ class LogicField {
                         ctx.fillRect(x, y, width, height);
                     }
                 }
+                ctx.font = menu_font_size() + `px ${"Helvetica"}`;
+                ;
+                ctx.fillStyle = new RGB(255, 15, 15).htmlRBG();
+                ctx.strokeStyle = "#000000";
                 if (this.has_won()) {
-                    ctx.font = menu_font_size() + `px ${"Helvetica"}`;
-                    ;
-                    const message = `Victory in ${this.saved_guesses.length} Guesses! Game Over! Click to reset.`;
-                    const message_width = ctx.measureText(message).width;
-                    ctx.fillStyle = new RGB(255, 15, 15).htmlRBG();
-                    ctx.strokeStyle = "#000000";
+                    let message = `Victory in ${this.saved_guesses.length} Guesses!`;
+                    let message_width = ctx.measureText(message).width;
                     ctx.strokeText(message, this.width / 2 - message_width / 2, this.height / 2);
                     ctx.fillText(message, this.width / 2 - message_width / 2, this.height / 2);
+                    message = 'Game Over! Click to reset.';
+                    message_width = ctx.measureText(message).width;
+                    ctx.strokeText(message, this.width / 2 - message_width / 2, menu_font_size() + this.height / 2);
+                    ctx.fillText(message, this.width / 2 - message_width / 2, menu_font_size() + this.height / 2);
+                }
+                else if (this.has_lost()) {
+                    let message = `You've made ${this.saved_guesses.length} guesses, but still haven't won!`;
+                    let message_width = ctx.measureText(message).width;
+                    ctx.strokeText(message, this.width / 2 - message_width / 2, this.height / 2);
+                    ctx.fillText(message, this.width / 2 - message_width / 2, this.height / 2);
+                    message = 'Game Over! Click to reset.';
+                    message_width = ctx.measureText(message).width;
+                    ctx.strokeText(message, this.width / 2 - message_width / 2, menu_font_size() + this.height / 2);
+                    ctx.fillText(message, this.width / 2 - message_width / 2, menu_font_size() + this.height / 2);
                 }
             }
             const y = (this.guesses() - this.saved_guesses.length - +(this.saved_guesses.length === 0)) * height;
@@ -195,8 +225,9 @@ async function main() {
     touchListener.registerCallBack("touchstart", (event) => !game.has_won() && game.is_in_peg_selector(event.touchPos), (event) => {
         game.selected = game.get_peg(event.touchPos[1]);
     });
-    touchListener.registerCallBack("touchstart", (event) => game.has_won(), (event) => {
-        game = new LogicField(touchListener, game.choices_per_guess(), game.types, game.guesses(), game.height, game.width);
+    touchListener.registerCallBack("touchstart", (event) => true, (event) => {
+        if (game.has_won() || game.has_lost())
+            game = new LogicField(touchListener, game.choices_per_guess(), game.types, game.guesses(), game.height, game.width);
     });
     touchListener.registerCallBack("touchend", (event) => !game.has_won() && !game.is_in_peg_selector(event.touchPos), (event) => {
         if (game.selected)
