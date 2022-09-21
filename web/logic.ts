@@ -241,12 +241,22 @@ class LogicField implements GameObject {
             ctx.strokeStyle = "#000000";
 
             
-            let message = `There is a hidden answer made up of four colors available in the selection`;
+            let message = `There is a hidden answer made up of`;
             let message_width = ctx.measureText(message).width;
             let i = 0;
             ctx.strokeText(message, this.width / 2 - message_width / 2, this.height / 2 + i * menu_font_size());
             ctx.fillText(message, this.width / 2 - message_width / 2, this.height / 2 + i * menu_font_size());
-            message = `You get ${this.guesses()} guesses, and as you guess the game will give you feedback on your guesses, this works as follows:`;
+            message = `${this.types} colors available in the selection`;
+            message_width = ctx.measureText(message).width;
+            i++;
+            ctx.strokeText(message, this.width / 2 - message_width / 2, this.height / 2 + i * menu_font_size());
+            ctx.fillText(message, this.width / 2 - message_width / 2, this.height / 2 + i * menu_font_size());
+            message = `You get ${this.guesses()} guesses `;
+            message_width = ctx.measureText(message).width;
+            i++;
+            ctx.strokeText(message, this.width / 2 - message_width / 2, this.height / 2 + i * menu_font_size());
+            ctx.fillText(message, this.width / 2 - message_width / 2, this.height / 2 + i * menu_font_size());
+            message = `as you guess the game will give you feedback, this works as follows:`;
             message_width = ctx.measureText(message).width;
             i++;
             ctx.strokeText(message, this.width / 2 - message_width / 2, this.height / 2 + i * menu_font_size());
@@ -279,7 +289,7 @@ class LogicField implements GameObject {
             const peg = new Peg(i);
             peg.draw(canvas, ctx, x, y, width, render_height / this.types);
         }
-        if(this.selected)
+        if(this.selected && !isTouchSupported())
             this.selected.draw(canvas, ctx, this.touchListener.touchPos[0] - width / 2, this.touchListener.touchPos[1] - height / 2, width, height);
     }
     update_state(delta_time:number) {
