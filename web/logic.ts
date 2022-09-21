@@ -1,7 +1,7 @@
 import {SingleTouchListener, TouchMoveEvent, MouseDownTracker, isTouchSupported, KeyboardHandler} from './io.js'
 import {SimpleGridLayoutManager, GuiTextBox, GuiButton, GuiSpacer, getHeight, getWidth, RGB, ImageContainer, Sprite, GuiElement} from './gui.js'
 import {random, srand, max_32_bit_signed, get_angle, logToServer, logBinaryToServer, readFromServer, sleep} from './utils.js'
-import { GameObject } from './game_utils.js'
+import { GameObject, menu_font_size } from './game_utils.js'
 class Peg implements GameObject {
     type_id:number;
     constructor(type_id:number)
@@ -111,7 +111,6 @@ class LogicField implements GameObject {
         const clickRowIndex = Math.floor(touchPos[1] / this.height * this.guesses());
         const rowHeight = this.height / this.guesses();
         const currentRowY = rowHeight * (this.saved_guesses.length + 1);
-        console.log(clickRowIndex, this.saved_guesses.length, currentRowY)
         if(touchPos[1] > currentRowY - rowHeight && touchPos[0] < this.width * 9/10)
         {
             const width = this.width * 9/10;
@@ -131,6 +130,18 @@ class LogicField implements GameObject {
             return true;
         }
         return false;
+    }
+    has_won():boolean
+    {
+        let won = true;
+        if(this.saved_guesses.length)
+        for(let i = 0;won && i < this.answer.length; i++)
+        {
+            won = (this.answer[i].type_id === this.saved_guesses[this.saved_guesses.length - 1][i].type_id);
+        }
+        else
+            won = false;
+        return won;
     }
     draw(canvas:HTMLCanvasElement, ctx:CanvasRenderingContext2D, xi:number, yi:number, render_width:number = this.width, render_height:number = this.height) {
         this.width = render_width;
@@ -169,6 +180,16 @@ class LogicField implements GameObject {
                     ctx.strokeRect(x, y, width, height);
                     ctx.fillRect(x, y, width, height);
                 }
+            }
+            if(this.has_won())
+            {
+                ctx.font = menu_font_size() + `px ${"Helvetica"}`;;
+                const message = `Victory in ${this.saved_guesses.length} Guesses! Game Over! Click to reset.`;
+                const message_width = ctx.measureText(message).width;
+                ctx.fillStyle = new RGB(255, 15, 15).htmlRBG();
+                ctx.strokeStyle = "#000000";
+                ctx.strokeText(message, this.width / 2 - message_width / 2, this.height / 2);
+                ctx.fillText(message, this.width / 2 - message_width / 2, this.height / 2);
             }
         }
         const y = (this.guesses() - this.saved_guesses.length - +(this.saved_guesses.length === 0)) * height;
@@ -214,10 +235,13 @@ async function main()
     let height = getHeight();
     let width = getWidth();
     let game = new LogicField(touchListener, 4, 8, 16, height, width);
-    touchListener.registerCallBack("touchstart", (event:TouchMoveEvent) => game.is_in_peg_selector(event.touchPos), (event:TouchMoveEvent) => {
+    touchListener.registerCallBack("touchstart", (event:TouchMoveEvent) => !game.has_won() && game.is_in_peg_selector(event.touchPos), (event:TouchMoveEvent) => {
         game.selected = game.get_peg(event.touchPos[1]);
     });
-    touchListener.registerCallBack("touchstart", (event:TouchMoveEvent) => !game.is_in_peg_selector(event.touchPos), (event:TouchMoveEvent) => {
+    touchListener.registerCallBack("touchstart", (event:TouchMoveEvent) => game.has_won(), (event:TouchMoveEvent) => {
+        game = new LogicField(touchListener, game.choices_per_guess(), game.types, game.guesses(), game.height, game.width);
+    });
+    touchListener.registerCallBack("touchend", (event:TouchMoveEvent) => !game.has_won() && !game.is_in_peg_selector(event.touchPos), (event:TouchMoveEvent) => {
         if(game.selected)
             game.try_to_place_peg(event.touchPos, game.selected);
     });

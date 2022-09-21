@@ -1,6 +1,7 @@
 import { SingleTouchListener, isTouchSupported, KeyboardHandler } from './io.js';
 import { getHeight, getWidth, RGB } from './gui.js';
 import { random } from './utils.js';
+import { menu_font_size } from './game_utils.js';
 class Peg {
     constructor(type_id) {
         this.type_id = type_id;
@@ -86,7 +87,6 @@ class LogicField {
         const clickRowIndex = Math.floor(touchPos[1] / this.height * this.guesses());
         const rowHeight = this.height / this.guesses();
         const currentRowY = rowHeight * (this.saved_guesses.length + 1);
-        console.log(clickRowIndex, this.saved_guesses.length, currentRowY);
         if (touchPos[1] > currentRowY - rowHeight && touchPos[0] < this.width * 9 / 10) {
             const width = this.width * 9 / 10;
             const index = Math.floor(touchPos[0] / width * this.choices_per_guess());
@@ -102,6 +102,16 @@ class LogicField {
             return true;
         }
         return false;
+    }
+    has_won() {
+        let won = true;
+        if (this.saved_guesses.length)
+            for (let i = 0; won && i < this.answer.length; i++) {
+                won = (this.answer[i].type_id === this.saved_guesses[this.saved_guesses.length - 1][i].type_id);
+            }
+        else
+            won = false;
+        return won;
     }
     draw(canvas, ctx, xi, yi, render_width = this.width, render_height = this.height) {
         this.width = render_width;
@@ -133,6 +143,16 @@ class LogicField {
                         ctx.strokeRect(x, y, width, height);
                         ctx.fillRect(x, y, width, height);
                     }
+                }
+                if (this.has_won()) {
+                    ctx.font = menu_font_size() + `px ${"Helvetica"}`;
+                    ;
+                    const message = `Victory in ${this.saved_guesses.length} Guesses! Game Over! Click to reset.`;
+                    const message_width = ctx.measureText(message).width;
+                    ctx.fillStyle = new RGB(255, 15, 15).htmlRBG();
+                    ctx.strokeStyle = "#000000";
+                    ctx.strokeText(message, this.width / 2 - message_width / 2, this.height / 2);
+                    ctx.fillText(message, this.width / 2 - message_width / 2, this.height / 2);
                 }
             }
             const y = (this.guesses() - this.saved_guesses.length - +(this.saved_guesses.length === 0)) * height;
@@ -172,10 +192,13 @@ async function main() {
     let height = getHeight();
     let width = getWidth();
     let game = new LogicField(touchListener, 4, 8, 16, height, width);
-    touchListener.registerCallBack("touchstart", (event) => game.is_in_peg_selector(event.touchPos), (event) => {
+    touchListener.registerCallBack("touchstart", (event) => !game.has_won() && game.is_in_peg_selector(event.touchPos), (event) => {
         game.selected = game.get_peg(event.touchPos[1]);
     });
-    touchListener.registerCallBack("touchstart", (event) => !game.is_in_peg_selector(event.touchPos), (event) => {
+    touchListener.registerCallBack("touchstart", (event) => game.has_won(), (event) => {
+        game = new LogicField(touchListener, game.choices_per_guess(), game.types, game.guesses(), game.height, game.width);
+    });
+    touchListener.registerCallBack("touchend", (event) => !game.has_won() && !game.is_in_peg_selector(event.touchPos), (event) => {
         if (game.selected)
             game.try_to_place_peg(event.touchPos, game.selected);
     });
