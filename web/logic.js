@@ -186,13 +186,48 @@ class LogicField {
                 }
             }
             const y = (this.guesses() - this.saved_guesses.length - +(this.saved_guesses.length === 0)) * height;
-            if (this.saved_guesses.length == 0)
+            if (this.saved_guesses.length == 0) {
                 for (let x = xi, j = 0; j < this.choices_per_guess(); x += width, j++) //show current row
                  {
                     ctx.strokeRect(x, y, width, height);
                     ctx.fillStyle = new RGB(250, 250, 250, 75).htmlRBGA();
                     ctx.fillRect(x, y, width, height);
                 }
+                ctx.font = menu_font_size() + `px ${"Helvetica"}`;
+                ;
+                ctx.fillStyle = new RGB(25, 255, 15).htmlRBG();
+                ctx.strokeStyle = "#000000";
+                let message = `There is a hidden answer made up of four colors available in the selection`;
+                let message_width = ctx.measureText(message).width;
+                let i = 0;
+                ctx.strokeText(message, this.width / 2 - message_width / 2, this.height / 2 + i * menu_font_size());
+                ctx.fillText(message, this.width / 2 - message_width / 2, this.height / 2 + i * menu_font_size());
+                message = `You get ${this.guesses()} guesses, and as you guess the game will give you feedback on your guesses, this works as follows:`;
+                message_width = ctx.measureText(message).width;
+                i++;
+                ctx.strokeText(message, this.width / 2 - message_width / 2, this.height / 2 + i * menu_font_size());
+                ctx.fillText(message, this.width / 2 - message_width / 2, this.height / 2 + i * menu_font_size());
+                message = `x means the color is not present`;
+                message_width = ctx.measureText(message).width;
+                i++;
+                ctx.strokeText(message, this.width / 2 - message_width / 2, this.height / 2 + i * menu_font_size());
+                ctx.fillText(message, this.width / 2 - message_width / 2, this.height / 2 + i * menu_font_size());
+                message = `o means you got the right color in the right place`;
+                message_width = ctx.measureText(message).width;
+                i++;
+                ctx.strokeText(message, this.width / 2 - message_width / 2, this.height / 2 + i * menu_font_size());
+                ctx.fillText(message, this.width / 2 - message_width / 2, this.height / 2 + i * menu_font_size());
+                message = `- means that the color is correct but the place is not`;
+                message_width = ctx.measureText(message).width;
+                i++;
+                ctx.strokeText(message, this.width / 2 - message_width / 2, this.height / 2 + i * menu_font_size());
+                ctx.fillText(message, this.width / 2 - message_width / 2, this.height / 2 + i * menu_font_size());
+                message = ``;
+                message_width = ctx.measureText(message).width;
+                i++;
+                ctx.strokeText(message, this.width / 2 - message_width / 2, this.height / 2 + i * menu_font_size());
+                ctx.fillText(message, this.width / 2 - message_width / 2, this.height / 2 + i * menu_font_size());
+            }
         }
         const x = render_width - peg_selection_space[0];
         for (let i = 0, y = 0; i < this.types; i++, y += render_height / this.types) {
