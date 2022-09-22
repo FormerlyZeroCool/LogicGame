@@ -1,5 +1,5 @@
 import {SingleTouchListener, TouchMoveEvent, MouseDownTracker, isTouchSupported, KeyboardHandler} from './io.js'
-import {SimpleGridLayoutManager, GuiTextBox, GuiButton, GuiSpacer, getHeight, getWidth, RGB, ImageContainer, Sprite, GuiElement} from './gui.js'
+import {render_regular_polygon, getHeight, getWidth, RGB} from './gui.js'
 import {random, srand, max_32_bit_signed, get_angle, logToServer, logBinaryToServer, readFromServer, sleep} from './utils.js'
 import { GameObject, menu_font_size } from './game_utils.js'
 class Peg implements GameObject {
@@ -11,9 +11,10 @@ class Peg implements GameObject {
     draw(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, x:number, y:number, width:number, height:number) {
         ctx.fillStyle = new RGB(125 + 60*this.type_id % 256, 92*this.type_id % 256, 125*this.type_id % 256).htmlRBG();  
         ctx.fillRect(x, y, width, height);
+        render_regular_polygon(ctx, Math.min(height,width) / 2, this.type_id + 3, x +  width / 4, y);
     }
     draw_with_markup(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, answer:Peg[], index:number, x:number, y:number, width:number, height:number) {
-        ctx.fillStyle = new RGB(125 + 60*this.type_id % 256, 92*this.type_id % 256, 125*this.type_id % 256).htmlRBG();  
+        ctx.fillStyle = new RGB(90 + 60*this.type_id % 256, 92*this.type_id % 256, 30+ 125*this.type_id % 256).htmlRBG();  
         ctx.fillRect(x, y, width, height);
         ctx.strokeStyle = new RGB(0, 0, 0, 125).htmlRBG();
         ctx.beginPath();
@@ -333,7 +334,7 @@ async function main()
     const touchScreen:boolean = isTouchSupported();
     let height = getHeight();
     let width = getWidth();
-    let game = new LogicField(touchListener, 4, 8, 8, height, width);
+    let game = new LogicField(touchListener, 4, 10, 8, height, width);
     touchListener.registerCallBack("touchstart", (event:TouchMoveEvent) => !game.has_won() && game.is_in_peg_selector(event.touchPos), (event:TouchMoveEvent) => {
         game.selected = game.get_peg(event.touchPos[1]);
     });

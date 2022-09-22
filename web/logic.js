@@ -1,5 +1,5 @@
 import { SingleTouchListener, isTouchSupported, KeyboardHandler } from './io.js';
-import { getHeight, getWidth, RGB } from './gui.js';
+import { render_regular_polygon, getHeight, getWidth, RGB } from './gui.js';
 import { random, srand, max_32_bit_signed } from './utils.js';
 import { menu_font_size } from './game_utils.js';
 class Peg {
@@ -9,9 +9,10 @@ class Peg {
     draw(canvas, ctx, x, y, width, height) {
         ctx.fillStyle = new RGB(125 + 60 * this.type_id % 256, 92 * this.type_id % 256, 125 * this.type_id % 256).htmlRBG();
         ctx.fillRect(x, y, width, height);
+        render_regular_polygon(ctx, Math.min(height, width) / 2, this.type_id + 3, x + width / 4, y);
     }
     draw_with_markup(canvas, ctx, answer, index, x, y, width, height) {
-        ctx.fillStyle = new RGB(125 + 60 * this.type_id % 256, 92 * this.type_id % 256, 125 * this.type_id % 256).htmlRBG();
+        ctx.fillStyle = new RGB(90 + 60 * this.type_id % 256, 92 * this.type_id % 256, 30 + 125 * this.type_id % 256).htmlRBG();
         ctx.fillRect(x, y, width, height);
         ctx.strokeStyle = new RGB(0, 0, 0, 125).htmlRBG();
         ctx.beginPath();
@@ -281,7 +282,7 @@ async function main() {
     const touchScreen = isTouchSupported();
     let height = getHeight();
     let width = getWidth();
-    let game = new LogicField(touchListener, 4, 8, 8, height, width);
+    let game = new LogicField(touchListener, 4, 10, 8, height, width);
     touchListener.registerCallBack("touchstart", (event) => !game.has_won() && game.is_in_peg_selector(event.touchPos), (event) => {
         game.selected = game.get_peg(event.touchPos[1]);
     });
