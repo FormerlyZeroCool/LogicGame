@@ -25,20 +25,7 @@ class Peg implements GameObject {
         ctx.beginPath();
         ctx.lineWidth = 4;
 
-        if(answer[index].type_id === this.type_id)
-        {
-            const radius = Math.min(height, width) - ctx.lineWidth;
-            //ctx.moveTo(x + width / 2 + radius, y + height / 2);
-            //ctx.arc(x + width / 2, y + height / 2, radius, 0, 2 * Math.PI);
-            ctx.font = radius + "px Helvetica";
-            const check = "\u2713";
-            const text_width = ctx.measureText(check).width;
-            
-            ctx.fillStyle = "#00FF00";
-
-            ctx.strokeText(check, x - width / 2, y + radius * .95);
-            ctx.fillText(check, x - width / 2, y + radius * .95);
-        }
+        
         let isPresent = false;
         for(let i = 0 ; i < answer.length; i++)
         {
@@ -59,6 +46,23 @@ class Peg implements GameObject {
                 ctx.moveTo(x + width, y);
                 ctx.lineTo(x, y + height);
             }
+        }
+        else
+        {
+           // if(answer[index].type_id === this.type_id)
+        
+            const radius = Math.min(height, width) - ctx.lineWidth;
+            //ctx.moveTo(x + width / 2 + radius, y + height / 2);
+            //ctx.arc(x + width / 2, y + height / 2, radius, 0, 2 * Math.PI);
+            ctx.font = radius + "px Helvetica";
+            const check = "\u2713";
+            const text_width = ctx.measureText(check).width;
+            
+            ctx.fillStyle = "#00FF00";
+
+            ctx.strokeText(check, x + width / 2 - text_width / 2, y + radius * .95);
+            ctx.fillText(check, x + width / 2 - text_width / 2, y + radius * .95);
+        
         }
         ctx.stroke();
     }
@@ -357,11 +361,13 @@ async function main()
     touchListener.registerCallBack("touchstart", (event:TouchMoveEvent) => true, (event:TouchMoveEvent) => {
         if(game.has_won() || game.has_lost())
             game = new LogicField(touchListener, game.choices_per_guess(), game.types, game.guesses(), game.height, game.width);
+        window.game = game;
     });
     touchListener.registerCallBack("touchend", (event:TouchMoveEvent) => !game.has_won() && !game.is_in_peg_selector(event.touchPos), (event:TouchMoveEvent) => {
         if(game.selected)
             game.try_to_place_peg(event.touchPos, game.selected);
     });
+    window.game = game;
     let maybectx:CanvasRenderingContext2D | null = canvas.getContext("2d");
     if(!maybectx)
         return;
