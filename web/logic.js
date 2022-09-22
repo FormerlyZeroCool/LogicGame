@@ -13,7 +13,7 @@ class Peg {
     draw_with_markup(canvas, ctx, answer, index, x, y, width, height) {
         ctx.fillStyle = new RGB(125 + 60 * this.type_id % 256, 92 * this.type_id % 256, 125 * this.type_id % 256).htmlRBG();
         ctx.fillRect(x, y, width, height);
-        ctx.strokeStyle = new RGB(125, 125, 125, 125).htmlRBG();
+        ctx.strokeStyle = new RGB(0, 0, 0, 125).htmlRBG();
         ctx.beginPath();
         ctx.lineWidth = 4;
         if (answer[index].type_id === this.type_id) {
@@ -247,6 +247,17 @@ class LogicField {
         for (let i = 0, y = 0; i < this.types; i++, y += render_height / this.types) {
             const peg = new Peg(i);
             peg.draw(canvas, ctx, x, y, width, render_height / this.types);
+            if (this.selected && peg.type_id === this.selected.type_id) {
+                const width = this.width / 10;
+                ctx.strokeStyle = new RGB(0, 0, 0, 125).htmlRBG();
+                ctx.beginPath();
+                ctx.lineWidth = 4;
+                ctx.moveTo(x, y);
+                ctx.lineTo(x + width, y + height);
+                ctx.moveTo(x + width, y);
+                ctx.lineTo(x, y + height);
+                ctx.stroke();
+            }
         }
         if (this.selected && !isTouchSupported())
             this.selected.draw(canvas, ctx, this.touchListener.touchPos[0] - width / 2, this.touchListener.touchPos[1] - height / 2, width, height);
@@ -270,7 +281,7 @@ async function main() {
     const touchScreen = isTouchSupported();
     let height = getHeight();
     let width = getWidth();
-    let game = new LogicField(touchListener, 4, 8, 16, height, width);
+    let game = new LogicField(touchListener, 4, 8, 8, height, width);
     touchListener.registerCallBack("touchstart", (event) => !game.has_won() && game.is_in_peg_selector(event.touchPos), (event) => {
         game.selected = game.get_peg(event.touchPos[1]);
     });
