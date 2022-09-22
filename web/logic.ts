@@ -358,9 +358,10 @@ async function main()
     touchListener.registerCallBack("touchstart", (event:TouchMoveEvent) => !game.has_won() && game.is_in_peg_selector(event.touchPos), (event:TouchMoveEvent) => {
         game.selected = game.get_peg(event.touchPos[1]);
     });
+    let places_mod = 0;
     touchListener.registerCallBack("touchstart", (event:TouchMoveEvent) => true, (event:TouchMoveEvent) => {
         if(game.has_won() || game.has_lost())
-            game = new LogicField(touchListener, game.choices_per_guess(), game.types + 1, game.guesses(), game.height, game.width);
+            game = new LogicField(touchListener, game.choices_per_guess() + Math.floor(places_mod++ / 5), game.types + 1, game.guesses(), game.height, game.width);
         window.game = game;
     });
     touchListener.registerCallBack("touchend", (event:TouchMoveEvent) => !game.has_won() && !game.is_in_peg_selector(event.touchPos), (event:TouchMoveEvent) => {
