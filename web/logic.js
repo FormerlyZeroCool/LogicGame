@@ -87,7 +87,7 @@ class LogicField {
     try_to_place_peg(touchPos, selected) {
         const clickRowIndex = Math.floor(touchPos[1] / this.height * this.guesses());
         const rowHeight = this.height / this.guesses();
-        const currentRowY = rowHeight * (16 - this.saved_guesses.length);
+        const currentRowY = rowHeight * (this.guesses() - this.saved_guesses.length);
         if (touchPos[1] > currentRowY - rowHeight && touchPos[0] < this.width * 9 / 10) {
             const width = this.width * 9 / 10;
             const index = Math.floor(touchPos[0] / width * this.choices_per_guess());
