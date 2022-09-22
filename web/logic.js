@@ -23,24 +23,32 @@ class Peg {
         ctx.beginPath();
         ctx.lineWidth = 4;
         if (answer[index].type_id === this.type_id) {
-            const radius = Math.min(height, width) / 2 - ctx.lineWidth;
-            ctx.moveTo(x + width / 2 + radius, y + height / 2);
-            ctx.arc(x + width / 2, y + height / 2, radius, 0, 2 * Math.PI);
+            const radius = Math.min(height, width) - ctx.lineWidth;
+            //ctx.moveTo(x + width / 2 + radius, y + height / 2);
+            //ctx.arc(x + width / 2, y + height / 2, radius, 0, 2 * Math.PI);
+            ctx.font = radius + "px Helvetica";
+            const check = "\u2713";
+            const text_width = ctx.measureText(check).width;
+            ctx.fillStyle = "#00FF00";
+            ctx.strokeText(check, x - width / 2, y + radius * .95);
+            ctx.fillText(check, x - width / 2, y + radius * .95);
         }
         let isPresent = false;
         for (let i = 0; i < answer.length; i++) {
             if (answer[i].type_id === this.type_id)
                 isPresent = true;
         }
-        if (isPresent) {
-            ctx.moveTo(x, y + height / 2);
-            ctx.lineTo(x + width, y + height / 2);
-        }
-        else {
-            ctx.moveTo(x, y);
-            ctx.lineTo(x + width, y + height);
-            ctx.moveTo(x + width, y);
-            ctx.lineTo(x, y + height);
+        if (answer[index].type_id !== this.type_id) {
+            if (isPresent) {
+                ctx.moveTo(x, y + height / 2);
+                ctx.lineTo(x + width, y + height / 2);
+            }
+            else {
+                ctx.moveTo(x, y);
+                ctx.lineTo(x + width, y + height);
+                ctx.moveTo(x + width, y);
+                ctx.lineTo(x, y + height);
+            }
         }
         ctx.stroke();
     }
