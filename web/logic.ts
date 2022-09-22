@@ -159,7 +159,12 @@ class LogicField implements GameObject {
         const final_guess = this.saved_guesses[this.saved_guesses.length - 1];
         if(lost)
         {
-             lost = this.compare_answer(final_guess, this.answer);   
+             lost = !this.compare_answer(final_guess, this.answer);   
+             for(let i = 0;lost && i < final_guess.length; i++)
+             {
+                if(final_guess[i].type_id === -1)
+                    lost = false;
+             }
         }
         return lost;
     }
