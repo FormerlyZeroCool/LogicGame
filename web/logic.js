@@ -9,11 +9,15 @@ class Peg {
     draw(canvas, ctx, x, y, width, height) {
         ctx.fillStyle = new RGB(125 + 60 * this.type_id % 256, 92 * this.type_id % 256, 125 * this.type_id % 256).htmlRBG();
         ctx.fillRect(x, y, width, height);
-        render_regular_polygon(ctx, Math.min(height, width) / 2, this.type_id + 3, x + width / 4, y);
+        ctx.lineWidth = 2;
+        const radius = Math.min(height, width) / 2;
+        render_regular_polygon(ctx, radius, this.type_id + 3, x + width / 2 - radius, y);
+        const color_index = this.type_id + 4;
+        ctx.fillStyle = new RGB(125 + 30 * color_index % 256, 62 * color_index % 256, 50 * color_index % 256).htmlRBG();
+        ctx.fill();
     }
     draw_with_markup(canvas, ctx, answer, index, x, y, width, height) {
-        ctx.fillStyle = new RGB(90 + 60 * this.type_id % 256, 92 * this.type_id % 256, 30 + 125 * this.type_id % 256).htmlRBG();
-        ctx.fillRect(x, y, width, height);
+        this.draw(canvas, ctx, x, y, width, height);
         ctx.strokeStyle = new RGB(0, 0, 0, 125).htmlRBG();
         ctx.beginPath();
         ctx.lineWidth = 4;
@@ -247,7 +251,7 @@ class LogicField {
         const x = render_width - peg_selection_space[0];
         for (let i = 0, y = 0; i < this.types; i++, y += render_height / this.types) {
             const peg = new Peg(i);
-            peg.draw(canvas, ctx, x, y, width, render_height / this.types);
+            peg.draw(canvas, ctx, x, y, render_width - x, render_height / this.types);
             if (this.selected && peg.type_id === this.selected.type_id) {
                 const width = this.width / 10;
                 ctx.strokeStyle = new RGB(0, 0, 0, 125).htmlRBG();

@@ -2124,19 +2124,55 @@ export function render_regular_polygon(ctx, radius, sides, x, y) {
     if (sides <= 2)
         return;
     ctx.beginPath();
-    const in_radius = radius * Math.cos(Math.PI / sides);
     const side_length = 2 * radius * Math.sin(Math.PI / sides);
-    const interior_angle = ((sides - 2) * Math.PI / sides);
     const exterior_angle = (2 * Math.PI / sides);
     let xi = 0;
     let yi = 0;
-    ctx.moveTo(x, y);
-    for (let i = 1; i <= sides; i++) {
+    let points = [];
+    let lowest_x = 1000000;
+    for (let i = 0; i < sides; i++) {
         const dx = side_length * Math.cos(exterior_angle * i);
         const dy = side_length * Math.sin(exterior_angle * i);
         xi = xi + dx;
         yi = yi + dy;
-        ctx.lineTo(xi + x, yi + y);
+        points.push(xi + x);
+        points.push(yi + y);
+        if (xi < lowest_x) {
+            lowest_x = xi;
+        }
+    }
+    ctx.moveTo(x - lowest_x, y);
+    for (let i = 0; i < points.length; i += 2) {
+        ctx.lineTo(points[i] - lowest_x, points[i + 1]);
+    }
+    ctx.stroke();
+}
+export function render_funky_regular_polygon(ctx, radius, sides, x, y) {
+    if (sides <= 2)
+        return;
+    ctx.beginPath();
+    const side_length = 2 * radius * Math.sin(Math.PI / sides);
+    const exterior_angle = (2 * Math.PI / sides);
+    let xi = 0;
+    let yi = 0;
+    let points = [];
+    let lowest_x = 1000000;
+    for (let i = 0; i < sides; i++) {
+        const dx = side_length * Math.cos(exterior_angle * i);
+        const dy = side_length * Math.sin(exterior_angle * i);
+        xi = xi + dx;
+        yi = yi + dy;
+        points.push(xi + x);
+        points.push(yi + y);
+        if (xi < lowest_x) {
+            lowest_x = xi;
+        }
+    }
+    ctx.moveTo(x - lowest_x, y);
+    for (let i = 0; i < points.length; i += 2) {
+        //ctx.lineTo(points[i + 4] - lowest_x, points[i + 1 + 4]);
+        ctx.lineTo(points[0] - lowest_x, points[1] - lowest_x);
+        ctx.lineTo(points[i] - lowest_x, points[i + 1]);
     }
     ctx.stroke();
 }
