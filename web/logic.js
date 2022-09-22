@@ -296,7 +296,7 @@ async function main() {
     const touchScreen = isTouchSupported();
     let height = getHeight();
     let width = getWidth();
-    let game = new LogicField(touchListener, 4, 10, 8, height, width);
+    let game = new LogicField(touchListener, 4, 12, 8, height, width);
     touchListener.registerCallBack("touchstart", (event) => !game.has_won() && game.is_in_peg_selector(event.touchPos), (event) => {
         game.selected = game.get_peg(event.touchPos[1]);
     });
