@@ -246,22 +246,22 @@ class LogicField implements GameObject {
             ctx.strokeStyle = "#000000";
 
             
-            let message = `There is a hidden answer made up of`;
+            let message = `There is a hidden answer made up of a combination of ${this.types} colors`;
             let message_width = ctx.measureText(message).width;
             let i = 0;
             ctx.strokeText(message, this.width / 2 - message_width / 2, this.height / 2 + i * menu_font_size());
             ctx.fillText(message, this.width / 2 - message_width / 2, this.height / 2 + i * menu_font_size());
-            message = `${this.types} colors available in the selection`;
+            message = `available in the selection tool on the right.`;
             message_width = ctx.measureText(message).width;
             i++;
             ctx.strokeText(message, this.width / 2 - message_width / 2, this.height / 2 + i * menu_font_size());
             ctx.fillText(message, this.width / 2 - message_width / 2, this.height / 2 + i * menu_font_size());
-            message = `You get ${this.guesses()} guesses `;
+            message = `You get ${this.guesses()} guesses as you guess`;
             message_width = ctx.measureText(message).width;
             i++;
             ctx.strokeText(message, this.width / 2 - message_width / 2, this.height / 2 + i * menu_font_size());
             ctx.fillText(message, this.width / 2 - message_width / 2, this.height / 2 + i * menu_font_size());
-            message = `as you guess the game will give you feedback, this works as follows:`;
+            message = `the game will give you feedback, this works as follows:`;
             message_width = ctx.measureText(message).width;
             i++;
             ctx.strokeText(message, this.width / 2 - message_width / 2, this.height / 2 + i * menu_font_size());
