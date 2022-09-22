@@ -13,7 +13,6 @@ class Peg {
         const radius = Math.min(height, width) / 2;
         render_regular_polygon(ctx, radius, this.type_id + 3, x + width / 2 - radius, y);
         const color_index = this.type_id + 4;
-        console.log(this.type_id, color_index);
         ctx.fillStyle = new RGB(125 + 30 * color_index % 256, 62 * color_index % 256, 50 * color_index % 256).htmlRBG();
         ctx.fill();
         ctx.beginPath();
