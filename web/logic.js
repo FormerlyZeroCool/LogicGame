@@ -302,8 +302,10 @@ async function main() {
     });
     let places_mod = 0;
     touchListener.registerCallBack("touchstart", (event) => true, (event) => {
-        if (game.has_won() || game.has_lost())
+        if (game.has_won())
             game = new LogicField(touchListener, game.choices_per_guess() + Math.floor(places_mod++ / 5), game.types + 1, game.guesses(), game.height, game.width);
+        else if (game.has_lost())
+            game = new LogicField(touchListener, game.choices_per_guess(), game.types, game.guesses(), game.height, game.width);
         window.game = game;
     });
     touchListener.registerCallBack("touchend", (event) => !game.has_won() && !game.is_in_peg_selector(event.touchPos), (event) => {
