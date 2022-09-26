@@ -1,3 +1,4 @@
+
 import {SingleTouchListener, TouchMoveEvent, MouseDownTracker, isTouchSupported, KeyboardHandler} from './io.js'
 import {render_funky_regular_polygon, render_regular_polygon, getHeight, getWidth, RGB} from './gui.js'
 import {random, srand, max_32_bit_signed, get_angle, logToServer, logBinaryToServer, readFromServer, sleep} from './utils.js'
@@ -345,7 +346,7 @@ class LogicField implements GameObject {
 async function main()
 {
     const canvas:HTMLCanvasElement = <HTMLCanvasElement> document.getElementById("screen");
-    const touchListener = new SingleTouchListener(canvas, false, true, false);
+    const touchListener = new SingleTouchListener(canvas, true, true, false);
     const keyboardHandler:KeyboardHandler = new KeyboardHandler();
 
 
@@ -368,17 +369,15 @@ async function main()
     let places_mod = 0;
     touchListener.registerCallBack("touchstart", (event:TouchMoveEvent) => true, (event:TouchMoveEvent) => {
         if(game.has_won())
-            game = new LogicField(touchListener, game.choices_per_guess() + Math.floor(places_mod++ / 5), game.types + 1, game.guesses(), game.height, game.width);
+            game = new LogicField(touchListener, game.choices_per_guess() + Math.floor(places_mod++ / 5), (game.types + 1 < 21 ? game.types + 1 : game.types), game.guesses(), game.height, game.width);
         else if(game.has_lost())
             game = new LogicField(touchListener, game.choices_per_guess(), game.types, game.guesses(), game.height, game.width);
 
-        window.game = game;
     });
     touchListener.registerCallBack("touchend", (event:TouchMoveEvent) => !game.has_won() && !game.is_in_peg_selector(event.touchPos), (event:TouchMoveEvent) => {
         if(game.selected)
             game.try_to_place_peg(event.touchPos, game.selected);
     });
-    window.game = game;
     let maybectx:CanvasRenderingContext2D | null = canvas.getContext("2d");
     if(!maybectx)
         return;
